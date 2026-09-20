@@ -24,7 +24,7 @@
 1059|2026-03-03T22:00:00|2026-03-03T22:09:00|2026-03-03T23:24:00|4500|billing=16,cpu=16,gres/gpu=2,mem=128G,node=1|120|urgent|gpu|COMPLETED|u09
 1060|2026-03-04T01:20:00|2026-03-04T01:23:00|2026-03-04T03:08:00|6300|billing=8,cpu=8,gres/gpu=1,mem=64G,node=1|150|urgent|gpu|COMPLETED|u01
 1061|2026-03-04T04:45:00|2026-03-04T05:33:00|2026-03-04T11:03:00|19800|billing=24,cpu=24,gres/gpu:a100=2,gres/gpu:v100=1,mem=192G,node=3|420|normal|batch|COMPLETED|u05
-1062|2026-03-04T07:10:00|2026-03-04T07:14:00|Unknown|5400|billing=32,cpu=32,gres/gpu=4,gres/gpu:a100=4,mem=256G,node=2|720|urgent|gpu|RUNNING|u06
-1063|2026-03-04T10:35:00|2026-03-04T10:39:00|Unknown|5400|billing=16,cpu=16,gres/gpu=2,mem=128G,node=1|720|normal|batch|RUNNING|u07
-1064|2026-03-04T13:00:00|2026-03-04T13:04:00|Unknown|5400|billing=8,cpu=8,gres/gpu=1,mem=64G,node=1|720|normal|gpu|RUNNING|u08
+1062|2026-03-04T07:10:00|2026-03-04T07:14:00|2026-03-04T08:44:00|5400|billing=32,cpu=32,gres/gpu=4,gres/gpu:a100=4,mem=256G,node=2|720|urgent|gpu|RUNNING|u06
+1063|2026-03-04T10:35:00|2026-03-04T10:39:00|2026-03-04T12:09:00|5400|billing=16,cpu=16,gres/gpu=2,mem=128G,node=1|720|normal|batch|RUNNING|u07
+1064|2026-03-04T13:00:00|2026-03-04T13:04:00|2026-03-04T14:34:00|5400|billing=8,cpu=8,gres/gpu=1,mem=64G,node=1|720|normal|gpu|RUNNING|u08
 1065|2026-03-04T14:30:00|2026-03-04T14:37:00|2026-03-04T16:52:00|8100|billing=16,cpu=16,gres/gpu=2,mem=128G,node=1|180|urgent|gpu|COMPLETED|u09

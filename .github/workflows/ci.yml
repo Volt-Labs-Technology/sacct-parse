@@ -29,16 +29,5 @@ jobs:
             fi
           done
           cargo package --no-verify
-      - name: cargo publish --dry-run fails only because publish is false
-        run: |
-          set +e
-          output=$(cargo publish --dry-run 2>&1)
-          status=$?
-          set -e
-          printf '%s\n' "${output}"
-          if [ "${status}" -eq 0 ]; then
-            echo "expected cargo publish --dry-run to fail because publish = false"
-            exit 1
-          fi
-          printf '%s\n' "${output}" | grep -q 'cannot be published'
-          printf '%s\n' "${output}" | grep -q 'package.publish'
+      - name: publish dry-run
+        run: cargo publish --dry-run
