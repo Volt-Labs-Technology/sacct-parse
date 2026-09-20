@@ -335,8 +335,8 @@ fn whole(
 /// calculation with no zone and no table. **Calculation.**
 ///
 /// This is Howard Hinnant's `days_from_civil`, reduced to what a date needs:
-/// a month of 1–12, a day of 1–31 that the month and year must be able to
-/// hold, and arithmetic that treats year 0 like any other.
+/// a month of 1–12, a day valid for that month and year, and arithmetic that
+/// treats year 0 like any other.
 fn civil_days(row: usize, field: &'static str, date: &str) -> Result<i64, Error> {
     let bad = |value: &str, expected: &'static str| Error::Field {
         row,
@@ -352,13 +352,29 @@ fn civil_days(row: usize, field: &'static str, date: &str) -> Result<i64, Error>
     let year: i64 = whole(row, field, year, "a year")?;
     let month: i64 = whole(row, field, month, "a month from 1 to 12")?;
     let day: i64 = whole(row, field, day, "a day from 1 to 31")?;
-    if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+    if !(1..=12).contains(&month) {
         return Err(bad(date, "a date whose month and day are real"));
     }
-    let leap = month <= 2;
+
+    let days_in_month = match month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 if year.rem_euclid(400) == 0
+            || (year.rem_euclid(4) == 0 && year.rem_euclid(100) != 0) =>
+        {
+            29
+        }
+        2 => 28,
+        _ => unreachable!("month was validated above"),
+    };
+    if !(1..=days_in_month).contains(&day) {
+        return Err(bad(date, "a date whose month and day are real"));
+    }
+
+    let jan_or_feb = month <= 2;
     let era = if year >= 0 { year } else { year - 399 } / 400;
     let year_of_era = year - era * 400;
-    let day_of_year = (153 * (month + if leap { 9 } else { -3 }) + 2) / 5 + day - 1;
+    let day_of_year = (153 * (month + if jan_or_feb { 9 } else { -3 }) + 2) / 5 + day - 1;
     let day_of_era = year_of_era * 365 + year_of_era / 4 - year_of_era / 100 + day_of_year;
     Ok(era * 146_097 + day_of_era - 719_468)
 }
@@ -630,6 +646,36 @@ mod tests {
                 ..
             }
         ));
+    }
+
+    #[test]
+    fn rejects_days_that_their_month_cannot_hold() {
+        for date in ["2026-02-31", "2025-02-29", "2026-04-31"] {
+            let stamp = format!("{date}T08:15:00");
+            let line = row("101", &stamp, "7200", "cpu=8", "180");
+
+            match fault(&line) {
+                Error::Field {
+                    row,
+                    field,
+                    value,
+                    ..
+                } => {
+                    assert_eq!(row, 1, "date {date}");
+                    assert_eq!(field, "Submit", "date {date}");
+                    assert_eq!(value, date, "date {date}");
+                }
+                other => panic!("expected a field error for {date}, got {other}"),
+            }
+        }
+    }
+
+    #[test]
+    fn accepts_february_29_in_a_leap_year() {
+        let stamp = "2024-02-29T08:15:00";
+        let line = row("101", stamp, "7200", "cpu=8", "180");
+
+        assert!(parse_row(&line, OFFSET).is_ok());
     }
 
     #[test]
