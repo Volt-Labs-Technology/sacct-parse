@@ -1,0 +1,23 @@
+[package]
+name = "crate-template"
+version = "0.1.0"
+edition = "2021"
+# REPLACE: the oldest Rust release this crate supports.
+rust-version = "1.70"
+# REPLACE: one sentence that says what this crate does.
+description = "REPLACE this sentence with a one-line description of the crate"
+# REPLACE: the real repository URL. homepage is the same URL.
+repository = "https://github.com/Volt-Labs-Technology/REPLACE-crate-name"
+homepage = "https://github.com/Volt-Labs-Technology/REPLACE-crate-name"
+# REPLACE: the docs.rs page for this crate.
+documentation = "https://docs.rs/REPLACE-crate-name"
+readme = "README.md"
+license = "MIT"
+# REPLACE: up to five crates.io keywords. Each is lowercase and hyphenated.
+keywords = ["replace-me"]
+# REPLACE: one or more slugs from https://crates.io/category_slugs
+categories = ["development-tools"]
+# Real crates created from this template delete the next line.
+publish = false
+
+[dependencies]
