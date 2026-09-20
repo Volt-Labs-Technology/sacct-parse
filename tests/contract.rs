@@ -1,5 +1,9 @@
 //! Consumer contract: the public row shape, field names, and sample counts.
 //!
+//! Pins named fields, variants, and behaviour. New `Record` fields, enum
+//! variants, and `Error` fields are allowed; renaming or removing a named
+//! item is not.
+//!
 //! Synthetic fixtures; nothing here was measured.
 
 use std::fs;
@@ -33,59 +37,23 @@ fn parsed(line: &str) -> Record {
     parse_row(line, OFFSET).expect("the row parses")
 }
 
-fn limit_kind(limit: Limit) -> &'static str {
-    match limit {
-        Limit::Minutes(_) => "minutes",
-        Limit::Unlimited => "unlimited",
-    }
-}
-
-fn state_kind(state: &State) -> &'static str {
-    match state {
-        State::Completed => "completed",
-        State::Timeout => "timeout",
-        State::Failed => "failed",
-        State::Cancelled => "cancelled",
-        State::Running => "running",
-        State::Pending => "pending",
-        State::Other(_) => "other",
-    }
-}
-
 #[test]
 fn completed_row_pins_record_fields() {
     let record = parsed(COMPLETED_ROW);
 
     assert_eq!(record.gpu_count(), 1);
     assert!(!record.is_step());
-    assert_eq!(limit_kind(record.timelimit), "minutes");
-    assert_eq!(state_kind(&record.state), "completed");
-
-    let Record {
-        job_id,
-        submit,
-        start,
-        end,
-        elapsed_seconds,
-        alloc_tres,
-        timelimit,
-        qos,
-        partition,
-        state,
-        user,
-    } = record;
-
-    assert_eq!(job_id, "101");
-    assert_eq!(submit, 1_772_460_900);
-    assert_eq!(start, 1_772_460_000);
-    assert_eq!(end, 1_772_463_600);
-    assert_eq!(elapsed_seconds, 7200);
-    assert_eq!(alloc_tres.get("gres/gpu"), Some(&1));
-    assert_eq!(timelimit, Limit::Minutes(180));
-    assert_eq!(qos, "normal");
-    assert_eq!(partition, "batch");
-    assert_eq!(state, State::Completed);
-    assert_eq!(user, "u01");
+    assert_eq!(record.job_id, "101");
+    assert_eq!(record.submit, 1_772_460_900);
+    assert_eq!(record.start, 1_772_460_000);
+    assert_eq!(record.end, 1_772_463_600);
+    assert_eq!(record.elapsed_seconds, 7200);
+    assert_eq!(record.alloc_tres.get("gres/gpu"), Some(&1));
+    assert_eq!(record.timelimit, Limit::Minutes(180));
+    assert_eq!(record.qos, "normal");
+    assert_eq!(record.partition, "batch");
+    assert_eq!(record.state, State::Completed);
+    assert_eq!(record.user, "u01");
 }
 
 #[test]
@@ -99,7 +67,6 @@ fn unlimited_timelimit_is_limit_unlimited() {
     ));
 
     assert_eq!(record.timelimit, Limit::Unlimited);
-    assert_eq!(limit_kind(record.timelimit), "unlimited");
 }
 
 #[test]
@@ -113,7 +80,6 @@ fn cancelled_by_clause_is_state_cancelled() {
     ));
 
     assert_eq!(record.state, State::Cancelled);
-    assert_eq!(state_kind(&record.state), "cancelled");
 }
 
 #[test]
@@ -165,6 +131,7 @@ fn ten_fields_is_arity_error_on_row_one() {
             row,
             expected,
             actual,
+            ..
         }) => {
             assert_eq!(row, 1);
             assert_eq!(expected, 11);
@@ -226,16 +193,16 @@ fn sample_file_parses_thirty_records_with_five_steps() {
 }
 
 #[test]
-fn limit_and_state_variants_are_exhaustive() {
-    assert_eq!(limit_kind(Limit::Minutes(1)), "minutes");
-    assert_eq!(limit_kind(Limit::Unlimited), "unlimited");
-    assert_eq!(state_kind(&State::Completed), "completed");
-    assert_eq!(state_kind(&State::Timeout), "timeout");
-    assert_eq!(state_kind(&State::Failed), "failed");
-    assert_eq!(state_kind(&State::Cancelled), "cancelled");
-    assert_eq!(state_kind(&State::Running), "running");
-    assert_eq!(state_kind(&State::Pending), "pending");
-    assert_eq!(state_kind(&State::Other(String::new())), "other");
+fn named_limit_and_state_variants_still_exist() {
+    assert!(matches!(Limit::Minutes(1), Limit::Minutes(_)));
+    assert!(matches!(Limit::Unlimited, Limit::Unlimited));
+    assert!(matches!(State::Completed, State::Completed));
+    assert!(matches!(State::Timeout, State::Timeout));
+    assert!(matches!(State::Failed, State::Failed));
+    assert!(matches!(State::Cancelled, State::Cancelled));
+    assert!(matches!(State::Running, State::Running));
+    assert!(matches!(State::Pending, State::Pending));
+    assert!(matches!(State::Other(String::new()), State::Other(_)));
 }
 
 #[test]
