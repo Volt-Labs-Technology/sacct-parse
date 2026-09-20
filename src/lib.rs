@@ -365,7 +365,7 @@ fn civil_days(row: usize, field: &'static str, date: &str) -> Result<i64, Error>
             29
         }
         2 => 28,
-        _ => unreachable!("month was validated above"),
+        _ => return Err(bad(date, "a date whose month and day are real")),
     };
     if !(1..=days_in_month).contains(&day) {
         return Err(bad(date, "a date whose month and day are real"));
@@ -650,16 +650,13 @@ mod tests {
 
     #[test]
     fn rejects_days_that_their_month_cannot_hold() {
-        for date in ["2026-02-31", "2025-02-29", "2026-04-31"] {
+        for date in ["2026-02-31", "2025-02-29", "2026-04-31", "1900-02-29"] {
             let stamp = format!("{date}T08:15:00");
             let line = row("101", &stamp, "7200", "cpu=8", "180");
 
             match fault(&line) {
                 Error::Field {
-                    row,
-                    field,
-                    value,
-                    ..
+                    row, field, value, ..
                 } => {
                     assert_eq!(row, 1, "date {date}");
                     assert_eq!(field, "Submit", "date {date}");
@@ -672,10 +669,11 @@ mod tests {
 
     #[test]
     fn accepts_february_29_in_a_leap_year() {
-        let stamp = "2024-02-29T08:15:00";
-        let line = row("101", stamp, "7200", "cpu=8", "180");
-
-        assert!(parse_row(&line, OFFSET).is_ok());
+        // Synthetic dates; 2024 and 2000 are leap years, 2000 also divisible by 400.
+        for stamp in ["2024-02-29T08:15:00", "2000-02-29T08:15:00"] {
+            let line = row("101", stamp, "7200", "cpu=8", "180");
+            assert!(parse_row(&line, OFFSET).is_ok(), "{stamp}");
+        }
     }
 
     #[test]
