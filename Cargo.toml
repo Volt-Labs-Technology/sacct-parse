@@ -1,23 +1,16 @@
 [package]
-name = "crate-template"
+name = "sacct-parse"
 version = "0.1.0"
 edition = "2021"
-# REPLACE: the oldest Rust release this crate supports.
 rust-version = "1.70"
-# REPLACE: one sentence that says what this crate does.
-description = "REPLACE this sentence with a one-line description of the crate"
-# REPLACE: the real repository URL. homepage is the same URL.
-repository = "https://github.com/Volt-Labs-Technology/REPLACE-crate-name"
-homepage = "https://github.com/Volt-Labs-Technology/REPLACE-crate-name"
-# REPLACE: the docs.rs page for this crate.
-documentation = "https://docs.rs/REPLACE-crate-name"
+description = "Parse Slurm sacct --parsable2 rows into typed records. It does not run sacct or decide which jobs matter."
+repository = "https://github.com/Volt-Labs-Technology/sacct-parse"
+homepage = "https://github.com/Volt-Labs-Technology/sacct-parse"
+documentation = "https://docs.rs/sacct-parse"
 readme = "README.md"
 license = "MIT"
-# REPLACE: up to five crates.io keywords. Each is lowercase and hyphenated.
-keywords = ["replace-me"]
-# REPLACE: one or more slugs from https://crates.io/category_slugs
-categories = ["development-tools"]
-# Real crates created from this template delete the next line.
-publish = false
+keywords = ["slurm", "sacct", "hpc", "parser"]
+categories = ["parser-implementations", "science"]
 
 [dependencies]
+thiserror = "1"
