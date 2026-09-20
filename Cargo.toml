@@ -13,4 +13,4 @@ keywords = ["slurm", "sacct", "hpc", "parser"]
 categories = ["parser-implementations", "science"]
 
 [dependencies]
-thiserror = "1"
+thiserror = "2"
